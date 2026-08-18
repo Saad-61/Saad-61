@@ -1,6 +1,10 @@
 # Saad Asif
 
-Software developer building **AI / Computer Vision systems**, **Web applications**, and **Open-Source tools**.
+Software developer specializing in **AI & Computer Vision**, **RAG Systems**, and **Full-Stack Web Engineering**.
+
+- 💻 Core Stack: **TypeScript, Python, PyTorch, React, C++**
+- 🔭 Currently building: Intelligent job matching systems & interactive web apps
+- 📬 Contact: [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com)
 
 ---
 
@@ -39,6 +43,10 @@ Software developer building **AI / Computer Vision systems**, **Web applications
 ---
 
 <p align="center">
+  <a href="mailto:saadasif78656@gmail.com">
+    <img src="https://img.shields.io/badge/Email-saadasif78656%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white" />
+  </a>
+  &nbsp;
   <a href="https://github.com/Saad-61">
     <img src="https://img.shields.io/badge/GitHub-Saad--61-181717?style=flat-square&logo=github" />
   </a>
