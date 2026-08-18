@@ -1,16 +1,44 @@
-## Hi there 👋
+# Saad Asif
 
-<!--
-**Saad-61/Saad-61** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Software developer building **AI / Computer Vision systems**, **Web applications**, and **Open-Source tools**.
 
-Here are some ideas to get you started:
+---
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+### Tech Stack
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat-square&logo=cplusplus&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
+
+---
+
+### Selected Projects
+
+| Project | Role | Description |
+| :--- | :--- | :--- |
+| **[CVClinic-Project](https://github.com/Saad-61/CVClinic-Project)** | Author | AI-powered RAG system matching CVs to job postings & skill gap analysis. |
+| **[Itemdle](https://github.com/ahtishamdilawar/itemdle)** | Co-Author | Interactive item-guessing web game application. |
+| **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | Smart platform connecting clients with professional photographers (FYP). |
+| **[Valorant-Team-Scouting-Tool](https://github.com/Saad-61/Valorant-Team-Scouting-Tool)** | Author | AI-powered esports scouting dashboard for VALORANT teams. |
+| **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline with GPU-accelerated multi-label deep learning. |
+
+---
+
+### Contribution Activity
+
+<p align="center">
+  <img src="https://github-readme-stats.demolab.com/api?username=Saad-61&show_icons=true&theme=tokyonight&hide_border=true&count_private=true" height="150" alt="GitHub Stats" />
+  <img src="https://github-readme-stats.demolab.com/api/top-langs/?username=Saad-61&layout=compact&theme=tokyonight&hide_border=true" height="150" alt="Top Languages" />
+</p>
+
+---
+
+<p align="center">
+  <a href="https://github.com/Saad-61">
+    <img src="https://img.shields.io/badge/GitHub-Saad--61-181717?style=flat-square&logo=github" />
+  </a>
+</p>
