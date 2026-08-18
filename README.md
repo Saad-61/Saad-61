@@ -1,34 +1,31 @@
 # Saad Asif
 
-Software developer specializing in **AI & Computer Vision**, **RAG Systems**, and **Full-Stack Web Engineering**.
+Software Engineer specializing in **Full-Stack Web Architecture**, **RAG Pipelines**, and **Applied AI/CV**.
 
-- 💻 Core Stack: **TypeScript, Python, PyTorch, React, C++**
-- 🔭 Currently building: Intelligent job matching systems & interactive web apps
-- 📬 Contact: [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com) | [LinkedIn](https://www.linkedin.com/in/saadasif30/)
+🎓 **BS Computer Science** @ FAST-NUCES (Graduating June 2026)  
+🌐 [saadasif.me](https://saadasif.me) | 💼 [LinkedIn](https://www.linkedin.com/in/saadasif30/) | 📬 [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com)
 
 ---
 
 ### Tech Stack
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
-![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=flat-square&logo=cplusplus&logoColor=white)
-![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
+<p align="left">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=ts,js,py,cpp,react,nextjs,nodejs,express,fastapi,postgres,mongodb,supabase,docker,git,tailwind,pytorch" alt="Tech Stack" />
+  </a>
+</p>
 
 ---
 
 ### Selected Projects
 
-| Project | Role | Description |
-| :--- | :--- | :--- |
-| **[CVClinic-Project](https://github.com/Saad-61/CVClinic-Project)** | Author | AI-powered RAG system matching CVs to job postings & skill gap analysis. |
-| **[Itemdle](https://github.com/ahtishamdilawar/itemdle)** | Co-Author | Interactive item-guessing web game application. |
-| **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | Smart platform connecting clients with professional photographers (FYP). |
-| **[Valorant-Team-Scouting-Tool](https://github.com/Saad-61/Valorant-Team-Scouting-Tool)** | Author | AI-powered esports scouting dashboard for VALORANT teams. |
-| **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline with GPU-accelerated multi-label deep learning. |
+| Project | Role | Description | Tech Stack |
+| :--- | :--- | :--- | :--- |
+| **[CVClinic](https://github.com/Saad-61/CVClinic-Project)** | Author | Hybrid RAG resume optimization platform with FAISS vector search & LLM-as-a-Judge benchmarking. | `React`, `TypeScript`, `FastAPI`, `FAISS`, `Gemini API` |
+| **[Itemdle](https://github.com/ahtishamdilawar/itemdle)** | Co-Author | Wordle-style League of Legends guessing game with serverless DB & pre-fetch caching pipeline. | `Next.js`, `TypeScript`, `Node.js`, `Supabase`, `PostgreSQL` |
+| **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | AI-powered photography marketplace with PuLP ILP recommendation engine & InsightFace clustering. | `React`, `FastAPI`, `Supabase`, `PostgreSQL`, `WebSockets` |
+| **[Valorant-Scouting-Tool](https://github.com/Saad-61/Valorant-Team-Scouting-Tool)** | Author | AI-powered esports scouting dashboard analyzing match telemetry for VALORANT teams. | `JavaScript`, `React`, `Node.js`, `REST APIs` |
+| **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline: feature ablation & GPU-based multi-label deep learning. | `Python`, `PyTorch`, `Jupyter`, `CUDA` |
 
 ---
 
@@ -43,15 +40,15 @@ Software developer specializing in **AI & Computer Vision**, **RAG Systems**, an
 ---
 
 <p align="center">
+  <a href="https://saadasif.me">
+    <img src="https://img.shields.io/badge/Portfolio-saadasif.me-000000?style=flat-square&logo=googlechrome&logoColor=white" />
+  </a>
+  &nbsp;
   <a href="https://www.linkedin.com/in/saadasif30/">
     <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" />
   </a>
   &nbsp;
   <a href="mailto:saadasif78656@gmail.com">
     <img src="https://img.shields.io/badge/Email-saadasif78656%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white" />
-  </a>
-  &nbsp;
-  <a href="https://github.com/Saad-61">
-    <img src="https://img.shields.io/badge/GitHub-Saad--61-181717?style=flat-square&logo=github" />
   </a>
 </p>
