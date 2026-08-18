@@ -4,7 +4,7 @@ Software developer specializing in **AI & Computer Vision**, **RAG Systems**, an
 
 - 💻 Core Stack: **TypeScript, Python, PyTorch, React, C++**
 - 🔭 Currently building: Intelligent job matching systems & interactive web apps
-- 📬 Contact: [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com)
+- 📬 Contact: [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com) | [LinkedIn](https://www.linkedin.com/in/saadasif30/)
 
 ---
 
@@ -43,6 +43,10 @@ Software developer specializing in **AI & Computer Vision**, **RAG Systems**, an
 ---
 
 <p align="center">
+  <a href="https://www.linkedin.com/in/saadasif30/">
+    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" />
+  </a>
+  &nbsp;
   <a href="mailto:saadasif78656@gmail.com">
     <img src="https://img.shields.io/badge/Email-saadasif78656%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white" />
   </a>
