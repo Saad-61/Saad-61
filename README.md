@@ -1,8 +1,8 @@
 # Saad Asif
 
-Software Engineer specializing in **Full-Stack Web Architecture**, **RAG Pipelines**, and **Applied AI/CV**.
+Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutions**.
 
-🎓 **BS Computer Science** @ FAST-NUCES (Graduating June 2026)  
+🎓 **BS Computer Science** @ FAST-NUCES (Graduated in June 2026)  
 🌐 [saadasif.me](https://saadasif.me) | 💼 [LinkedIn](https://www.linkedin.com/in/saadasif30/) | 📬 [saadasif78656@gmail.com](mailto:saadasif78656@gmail.com)
 
 ---
@@ -10,9 +10,22 @@ Software Engineer specializing in **Full-Stack Web Architecture**, **RAG Pipelin
 ### Tech Stack
 
 <p align="left">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=ts,js,py,cpp,react,nextjs,nodejs,express,fastapi,postgres,mongodb,supabase,docker,git,tailwind,pytorch" alt="Tech Stack" />
-  </a>
+  <img src="https://skillicons.dev/icons?i=ts" alt="TypeScript" title="TypeScript" />
+  <img src="https://skillicons.dev/icons?i=js" alt="JavaScript" title="JavaScript" />
+  <img src="https://skillicons.dev/icons?i=py" alt="Python" title="Python" />
+  <img src="https://skillicons.dev/icons?i=cpp" alt="C++" title="C++" />
+  <img src="https://skillicons.dev/icons?i=react" alt="React" title="React" />
+  <img src="https://skillicons.dev/icons?i=nextjs" alt="Next.js" title="Next.js" />
+  <img src="https://skillicons.dev/icons?i=nodejs" alt="Node.js" title="Node.js" />
+  <img src="https://skillicons.dev/icons?i=express" alt="Express" title="Express" />
+  <img src="https://skillicons.dev/icons?i=fastapi" alt="FastAPI" title="FastAPI" />
+  <img src="https://skillicons.dev/icons?i=postgres" alt="PostgreSQL" title="PostgreSQL" />
+  <img src="https://skillicons.dev/icons?i=mongodb" alt="MongoDB" title="MongoDB" />
+  <img src="https://skillicons.dev/icons?i=supabase" alt="Supabase" title="Supabase" />
+  <img src="https://skillicons.dev/icons?i=docker" alt="Docker" title="Docker" />
+  <img src="https://skillicons.dev/icons?i=git" alt="Git" title="Git" />
+  <img src="https://skillicons.dev/icons?i=tailwind" alt="TailwindCSS" title="TailwindCSS" />
+  <img src="https://skillicons.dev/icons?i=pytorch" alt="PyTorch" title="PyTorch" />
 </p>
 
 ---
@@ -45,7 +58,7 @@ Software Engineer specializing in **Full-Stack Web Architecture**, **RAG Pipelin
   </a>
   &nbsp;
   <a href="https://www.linkedin.com/in/saadasif30/">
-    <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white" />
+    <img src="https://img.shields.io/badge/LinkedIn-saadasif30-0A66C2?style=flat-square&logo=linkedin&logoColor=white" />
   </a>
   &nbsp;
   <a href="mailto:saadasif78656@gmail.com">
