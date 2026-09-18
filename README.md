@@ -35,9 +35,12 @@ Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutio
 | Project | Role | Description | Tech Stack |
 | :--- | :--- | :--- | :--- |
 | **[CVClinic](https://github.com/Saad-61/CVClinic-Project)** | Author | Hybrid RAG resume optimization platform with FAISS vector search & LLM-as-a-Judge benchmarking. | `React`, `TypeScript`, `FastAPI`, `FAISS`, `Gemini API` |
+| **[Smart Support Intelligence](https://github.com/Saad-61/Smart-Customer-Support-Intelligence-System)** | Author | Riot Games ticket triage engine with Platt-calibrated classification, XGBoost priority ranking & SHAP attribution. | `React 19`, `TypeScript`, `FastAPI`, `PyTorch`, `XGBoost` |
+| **[DocuMind AI](https://github.com/Saad-61/AI-Powered-Document-Classification---Intelligent-Information)** | Author | CV & NLP document classification, spatial EasyOCR text extraction, and structured field parsing engine. | `PyTorch`, `EasyOCR`, `FastAPI`, `React`, `TypeScript` |
+| **[Valorant-Scouting-Tool](https://github.com/Saad-61/Valorant-Team-Scouting-Tool)** | Author | AI-powered esports scouting dashboard analyzing match telemetry, map win rates, & team compositions. | `React`, `TypeScript`, `FastAPI`, `Node.js`, `REST APIs` |
 | **[Itemdle](https://github.com/ahtishamdilawar/itemdle)** | Co-Author | Wordle-style League of Legends guessing game with serverless DB & pre-fetch caching pipeline. | `Next.js`, `TypeScript`, `Node.js`, `Supabase`, `PostgreSQL` |
+| **[PDFtoDOC](https://github.com/Saad-61/PDFtoDOC)** | Author | Layout-preserving PDF to Word DOCX converter with real-time 4-stage stepper & multi-document batch queue. | `React`, `TypeScript`, `FastAPI`, `Vite`, `Python` |
 | **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | AI-powered photography marketplace with PuLP ILP recommendation engine & InsightFace clustering. | `React`, `FastAPI`, `Supabase`, `PostgreSQL`, `WebSockets` |
-| **[Valorant-Scouting-Tool](https://github.com/Saad-61/Valorant-Team-Scouting-Tool)** | Author | AI-powered esports scouting dashboard analyzing match telemetry for VALORANT teams. | `JavaScript`, `React`, `Node.js`, `REST APIs` |
 | **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline: feature ablation & GPU-based multi-label deep learning. | `Python`, `PyTorch`, `Jupyter`, `CUDA` |
 
 ---
