@@ -1,0 +1,38 @@
+name: Generate contribution ninja
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install renderer
+        run: pip install -r .github/ninja/requirements.txt
+      - name: Read this account's contribution calendar
+        env:
+          # Add a PROFILE_TOKEN secret with the read:user scope if you want
+          # private-contribution squares included too. The default token still
+          # renders public contribution activity.
+          GH_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
+          LOGIN: ${{ github.repository_owner }}
+        run: |
+          gh api graphql -f login="$LOGIN" -f query='query($login:String!) { user(login:$login) { contributionsCollection { contributionCalendar { weeks { contributionDays { contributionCount contributionLevel date } } } } } }' > contributions.json
+      - name: Render animation
+        run: python .github/ninja/generate_ninja.py --input contributions.json --output dist/contribution-ninja.gif
+      - name: Publish to output branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: output
+          publish_dir: ./dist
+          keep_files: false
