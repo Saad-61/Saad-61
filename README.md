@@ -43,7 +43,16 @@ Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutio
 | **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | AI-powered photography marketplace with PuLP ILP recommendation engine & InsightFace clustering. | `React`, `FastAPI`, `Supabase`, `PostgreSQL`, `WebSockets` |
 | **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline: feature ablation & GPU-based multi-label deep learning. | `Python`, `PyTorch`, `Jupyter`, `CUDA` |
 
+### Contribution Graph
 
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/contribution-ninja.gif"
+    alt="Pixel ninja clearing the contribution grid"
+  />
+</p>
+
+---
 
 <p align="center">
   <a href="https://saadasif.me">
