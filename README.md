@@ -43,19 +43,7 @@ Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutio
 | **[BookYourShoot](https://github.com/tahmeedahmad324/BookYourShoot)** | Co-Author | AI-powered photography marketplace with PuLP ILP recommendation engine & InsightFace clustering. | `React`, `FastAPI`, `Supabase`, `PostgreSQL`, `WebSockets` |
 | **[FaceVision-Bench](https://github.com/Saad-61/FaceVision-Bench)** | Author | CelebA computer vision pipeline: feature ablation & GPU-based multi-label deep learning. | `Python`, `PyTorch`, `Jupyter`, `CUDA` |
 
----
 
-### Contribution Graph
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake.svg">
-  <img alt="Commit Blast animated GitHub contribution grid with a pixel character firing at active cells" src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake.svg">
-</picture>
-
-<sub>Custom contribution animation: <strong>Commit Blast</strong>. See <a href="./COMMIT_KOMBAT.md">implementation notes + preview guide</a>.</sub>
-
----
 
 <p align="center">
   <a href="https://saadasif.me">
