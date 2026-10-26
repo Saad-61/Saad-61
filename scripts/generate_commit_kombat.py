@@ -97,7 +97,11 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
 
 def fetch_contribution_weeks(username: str, token: str, weeks: int) -> List[List[Dict[str, object]]]:
     today = dt.datetime.now(dt.timezone.utc)
-    start = today - dt.timedelta(days=(weeks * 7 + 14))
+    # GitHub GraphQL rejects contribution ranges longer than one year. Keep the
+    # requested calendar within 365 days while still allowing the API to return
+    # the usual 52/53 calendar columns, including partial boundary weeks.
+    lookback_days = min(364, max(1, weeks * 7 - 1))
+    start = today - dt.timedelta(days=lookback_days)
     payload = json.dumps(
         {
             "query": GRAPHQL_QUERY,
