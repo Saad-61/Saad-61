@@ -10,10 +10,12 @@ from xml.dom import minidom
 
 CELL, GAP = 10, 3
 PITCH = CELL + GAP
-PAD_L, PAD_R, PAD_T = 36, 16, 26
-LANE = 56
+PAD_L, PAD_R, PAD_T = 36, 16, 52  # PAD_T leaves room for the stats row above the month labels
+LANE = 76
 LEGEND = 26
-KIRBY_SCALE = 1.5
+KIRBY_SCALE, KIRBY_FULL = 1.5, 2.0  # Kirby grows from the first to the second size as tiles are eaten
+PASS_PAUSE = 0.6
+ANGLES = range(0, 360, 45)
 MOVE_PER_COL, MOVE_MIN = 0.07, 0.22
 FLIGHT, STAGGER, SETTLE = 0.85, 0.35, 0.2
 HOLD_EMPTY, FADE_IN, HOLD_FULL = 1.4, 0.8, 2.2
@@ -32,9 +34,19 @@ def read_days(source: Path) -> list[dict]:
                 "col": col,
                 "row": (when.weekday() + 1) % 7,  # GitHub rows run Sunday to Saturday
                 "level": LEVELS.get(str(day["contributionLevel"]), 0),
+                "count": int(day["contributionCount"]),
                 "date": when,
             })
     return days
+
+
+def summarize(days: list[dict]) -> tuple[int, int, dict]:
+    """Total contributions, longest consecutive-day streak, and the busiest day."""
+    streak = best = 0
+    for d in sorted(days, key=lambda d: d["date"]):
+        streak = streak + 1 if d["count"] else 0
+        best = max(best, streak)
+    return sum(d["count"] for d in days), best, max(days, key=lambda d: d["count"])
 
 
 def tile(col: int, row: int) -> tuple[float, float]:
@@ -69,7 +81,7 @@ def build(days: list[dict]) -> str:
     columns = max(d["col"] for d in days) + 1
     grid_w, grid_h = columns * PITCH - GAP, 7 * PITCH - GAP
     width = PAD_L + grid_w + PAD_R
-    lane_y = PAD_T + grid_h + 30
+    lane_y = PAD_T + grid_h + 36
     height = PAD_T + grid_h + LANE + LEGEND
     kirby_x = lambda col: tile(col, 0)[0] + CELL / 2
 
@@ -80,7 +92,9 @@ def build(days: list[dict]) -> str:
     clock, x = 0.6, start_x
     walk = [(0.0, x), (clock, x)]
     puffs, mouths, flights = [(0.0, 1.0), (clock, 1.0)], [(0.0, 0.0), (clock, 0.0)], []
-    for action in actions:
+    eaten_total = sum(len(a["cells"]) for a in actions)
+    eaten, grows, bursts = 0, [(0.0, KIRBY_SCALE)], {}
+    for index, action in enumerate(actions):
         target = kirby_x(action["col"])
         clock += max(MOVE_MIN, abs(action["col"] - (x - start_x) / PITCH) * MOVE_PER_COL)
         walk.append((clock, target))
@@ -98,16 +112,23 @@ def build(days: list[dict]) -> str:
         walk.append((end, target))
         mouths += [(arrive, 0.0), (arrive + 0.2, 1.0), (landed, 1.0), (end, 0.0)]
         puffs += [(arrive, 1.0), (landed, 1.0 + 0.1 + 0.05 * action["level"]), (end + 0.3, 1.0)]
+        eaten += len(action["cells"])
+        grows += [(arrive, grows[-1][1]), (landed, KIRBY_SCALE + (KIRBY_FULL - KIRBY_SCALE) * eaten / eaten_total)]
         clock = end
+        if index + 1 == len(actions) or actions[index + 1]["level"] != action["level"]:
+            bursts[action["level"]] = clock  # celebrate each finished pass in that level's green
+            clock += PASS_PAUSE
+            walk.append((clock, target))
     reset = clock + HOLD_EMPTY
     total = reset + FADE_IN + HOLD_FULL
     walk += [(reset + FADE_IN, start_x), (total, start_x)]
+    grows += [(reset, KIRBY_FULL), (reset + FADE_IN, KIRBY_SCALE), (total, KIRBY_SCALE)]
     puffs.append((total, 1.0))
     mouths.append((total, 0.0))
 
     css = [
-        ":root{--bg:#0d1117;--txt:#8b949e;--l0:#161b22;--l1:#0e4429;--l2:#006d32;--l3:#26a641;--l4:#39d353}",
-        "@media(prefers-color-scheme:light){:root{--bg:#ffffff;--txt:#57606a;--l0:#ebedf0;--l1:#9be9a8;--l2:#40c463;--l3:#30a14e;--l4:#216e39}}",
+        ":root{--bg:#0d1117;--txt:#8b949e;--hi:#e6edf3;--l0:#161b22;--l1:#0e4429;--l2:#006d32;--l3:#26a641;--l4:#39d353}",
+        "@media(prefers-color-scheme:light){:root{--bg:#ffffff;--txt:#57606a;--hi:#1f2328;--l0:#ebedf0;--l1:#9be9a8;--l2:#40c463;--l3:#30a14e;--l4:#216e39}}",
         ".t{width:10px;height:10px;rx:2;ry:2}.lbl{font:10px -apple-system,Segoe UI,Helvetica,Arial,sans-serif;fill:var(--txt)}",
         ".l0{fill:var(--l0)}.l1{fill:var(--l1)}.l2{fill:var(--l2)}.l3{fill:var(--l3)}.l4{fill:var(--l4)}",
         ".f{transform-box:fill-box;transform-origin:center}",
@@ -115,12 +136,23 @@ def build(days: list[dict]) -> str:
         f"#p{{animation:puff {total:.2f}s linear infinite;transform-box:fill-box;transform-origin:50% 85%}}",
         f"#m{{animation:mouth {total:.2f}s linear infinite;transform-box:fill-box;transform-origin:center}}",
         f"#w{{animation:wind {total:.2f}s linear infinite}}",
+        f"#g{{animation:grow {total:.2f}s ease-out infinite}}",
+        ".hi{fill:var(--hi);font-weight:600}",
     ]
+    frames_extra = []
+    for level, at in bursts.items():
+        css.append(f"#s{level}{{animation:burst{level} {total:.2f}s linear infinite;opacity:0}}")
+        frames_extra.append(
+            f"@keyframes burst{level}{{0%,{pct(at, total)}{{transform:scale(.3);opacity:0}}"
+            f"{pct(at + .15, total)}{{transform:scale(1);opacity:1}}"
+            f"{pct(at + PASS_PAUSE + .2, total)}{{transform:scale(1.7);opacity:0}}100%{{transform:scale(.3);opacity:0}}}}")
     frames = ["@keyframes walk{" + "".join(
         f"{pct(t, total)}{{transform:translate({px:.2f}px,{lane_y:.2f}px);animation-timing-function:ease-in-out}}" for t, px in walk) + "}",
         "@keyframes puff{" + "".join(f"{pct(t, total)}{{transform:scale({s:.3f})}}" for t, s in puffs) + "}",
         "@keyframes mouth{" + "".join(f"{pct(t, total)}{{transform:scale({s:.2f})}}" for t, s in mouths) + "}",
-        "@keyframes wind{" + "".join(f"{pct(t, total)}{{opacity:{s:.0f}}}" for t, s in mouths) + "}"]
+        "@keyframes wind{" + "".join(f"{pct(t, total)}{{opacity:{s:.0f}}}" for t, s in mouths) + "}",
+        "@keyframes grow{" + "".join(f"{pct(t, total)}{{transform:scale({s:.3f})}}" for t, s in grows) + "}",
+        *frames_extra]
 
     flown = {id(f[0]): f for f in flights}
     body = []
@@ -161,8 +193,20 @@ def build(days: list[dict]) -> str:
         legend.append(f'<rect class="t l{i}" x="{lx + 28 + i * PITCH}" y="{legend_y}"/>')
     legend.append(f'<text class="lbl" x="{lx + 32 + 5 * PITCH}" y="{legend_y + 9}">More</text>')
 
+    sparkles = "".join(
+        f'<g id="s{level}" class="l{level}">' + "".join(
+            f'<path transform="rotate({a}) translate(0,-24)" d="M0-3.2L1.3 0 0 3.2-1.3 0Z"/>' for a in ANGLES) + "</g>"
+        for level in bursts)
+
+    total_count, streak, busiest = summarize(days)
+    stats = (
+        f'<text class="lbl" x="{PAD_L}" y="18"><tspan class="hi">{total_count:,}</tspan> contributions in the last year'
+        f' &#183; <tspan class="hi">{streak}</tspan>-day longest streak'
+        f' &#183; busiest day <tspan class="hi">{busiest["count"]}</tspan> on {MONTHS[busiest["date"].month - 1]} {busiest["date"].day}</text>'
+    )
+
     kirby = (
-        f'<g id="k"><g transform="scale({KIRBY_SCALE})"><g id="w" opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
+        f'<g id="k">{sparkles}<g id="g"><g id="w" opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
         '<path d="M-4-14v-5M0-16v-6M4-14v-5"/></g>'
         '<g id="p"><ellipse cx="-6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(-12 -6.5 6.5)"/>'
         '<ellipse cx="6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(12 6.5 6.5)"/>'
@@ -178,7 +222,7 @@ def build(days: list[dict]) -> str:
         'role="img" aria-label="Kirby inhaling the contribution graph from dark to bright greens">'
         f'<style>{"".join(css)}{"".join(frames)}</style>'
         f'<rect width="100%" height="100%" fill="var(--bg)" rx="6"/>'
-        f'{"".join(labels)}{empties}{"".join(body)}{"".join(legend)}{kirby}</svg>'
+        f'{stats}{"".join(labels)}{empties}{"".join(body)}{"".join(legend)}{kirby}</svg>'
     )
 
 
