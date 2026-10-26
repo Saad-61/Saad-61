@@ -1,6 +1,9 @@
 name: Generate contribution ninja
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: "17 2 * * *"
   workflow_dispatch:
