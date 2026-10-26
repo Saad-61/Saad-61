@@ -11,7 +11,7 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Tuple
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
@@ -20,58 +20,34 @@ GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 class Theme:
     name: str
     background: str
-    panel: str
-    title: str
-    subtitle: str
     grid_empty: str
     grid_levels: Sequence[str]
-    left_fighter: str
-    right_fighter: str
-    left_health: str
-    right_health: str
-    combo_fill: str
-    combo_track: str
-    impact: str
-    special: str
-    border: str
+    character_primary: str
+    character_accent: str
+    projectile: str
+    flash: str
 
 
 THEMES: Dict[str, Theme] = {
     "light": Theme(
         name="light",
-        background="#f8fafc",
-        panel="#ffffff",
-        title="#0f172a",
-        subtitle="#334155",
+        background="#ffffff",
         grid_empty="#ebedf0",
         grid_levels=("#9be9a8", "#40c463", "#30a14e", "#216e39"),
-        left_fighter="#2563eb",
-        right_fighter="#dc2626",
-        left_health="#16a34a",
-        right_health="#eab308",
-        combo_fill="#7c3aed",
-        combo_track="#dbeafe",
-        impact="#f97316",
-        special="#be123c",
-        border="#cbd5e1",
+        character_primary="#2563eb",
+        character_accent="#0f172a",
+        projectile="#0ea5e9",
+        flash="#22d3ee",
     ),
     "dark": Theme(
         name="dark",
         background="#0d1117",
-        panel="#161b22",
-        title="#e6edf3",
-        subtitle="#8b949e",
         grid_empty="#161b22",
         grid_levels=("#0e4429", "#006d32", "#26a641", "#39d353"),
-        left_fighter="#60a5fa",
-        right_fighter="#fb7185",
-        left_health="#22c55e",
-        right_health="#f59e0b",
-        combo_fill="#a78bfa",
-        combo_track="#1f2937",
-        impact="#fb923c",
-        special="#f43f5e",
-        border="#30363d",
+        character_primary="#60a5fa",
+        character_accent="#e6edf3",
+        projectile="#38bdf8",
+        flash="#67e8f9",
     ),
 }
 
@@ -97,9 +73,7 @@ query($login: String!, $from: DateTime!, $to: DateTime!) {
 
 def fetch_contribution_weeks(username: str, token: str, weeks: int) -> List[List[Dict[str, object]]]:
     today = dt.datetime.now(dt.timezone.utc)
-    # GitHub GraphQL rejects contribution ranges longer than one year. Keep the
-    # requested calendar within 365 days while still allowing the API to return
-    # the usual 52/53 calendar columns, including partial boundary weeks.
+    # GitHub GraphQL rejects contribution ranges longer than one year.
     lookback_days = min(364, max(1, weeks * 7 - 1))
     start = today - dt.timedelta(days=lookback_days)
     payload = json.dumps(
@@ -120,7 +94,7 @@ def fetch_contribution_weeks(username: str, token: str, weeks: int) -> List[List
         headers={
             "Authorization": f"bearer {token}",
             "Content-Type": "application/json",
-            "User-Agent": "commit-kombat-generator",
+            "User-Agent": "commit-blast-generator",
         },
     )
 
@@ -223,56 +197,6 @@ def compute_levels(weeks: Sequence[Sequence[Dict[str, object]]]) -> List[List[in
     return levels
 
 
-def compute_metrics(weeks: Sequence[Sequence[Dict[str, object]]], levels: Sequence[Sequence[int]]) -> Dict[str, int]:
-    days = [day for week in weeks for day in week]
-    ordered_days = sorted(
-        days,
-        key=lambda d: d.get("date", "9999-12-31") or "9999-12-31",
-    )
-
-    longest_streak = 0
-    current_streak = 0
-    inactive_gaps = 0
-    total_commits = 0
-
-    for day in ordered_days:
-        count = int(day.get("contributionCount", 0))
-        total_commits += count
-        if count > 0:
-            current_streak += 1
-            longest_streak = max(longest_streak, current_streak)
-        else:
-            if current_streak > 0:
-                inactive_gaps += 1
-            current_streak = 0
-
-    weekly_totals = [sum(int(day.get("contributionCount", 0)) for day in week) for week in weeks]
-    max_weekly = max(weekly_totals, default=0)
-    max_level = max((level for week in levels for level in week), default=0)
-
-    player_health = 100
-    rival_health = 100
-    for total in weekly_totals:
-        if max_weekly > 0:
-            scaled = int(round((total / max_weekly) * 9))
-        else:
-            scaled = 0
-        rival_health = max(0, rival_health - scaled)
-        if total == 0:
-            player_health = max(0, player_health - 4)
-
-    return {
-        "longest_streak": longest_streak,
-        "current_streak": current_streak,
-        "inactive_gaps": inactive_gaps,
-        "total_commits": total_commits,
-        "max_weekly": max_weekly,
-        "player_health": player_health,
-        "rival_health": rival_health,
-        "max_level": max_level,
-    }
-
-
 def escape_xml(value: str) -> str:
     return (
         value.replace("&", "&amp;")
@@ -283,107 +207,125 @@ def escape_xml(value: str) -> str:
     )
 
 
-def render_fighter(x: int, y: int, facing: int, body_color: str, tag: str) -> str:
-    scale = -1 if facing < 0 else 1
-    tx = x if facing > 0 else x + 28
-    transform = f"translate({tx},{y}) scale({scale},1)"
+def pick_targets(levels: Sequence[Sequence[int]], max_targets: int = 12) -> List[Tuple[int, int, int]]:
+    per_column: List[Tuple[int, int, int]] = []
+    for wx, week in enumerate(levels):
+        best_level = max(week)
+        if best_level <= 0:
+            continue
+        dy = week.index(best_level)
+        per_column.append((wx, dy, best_level))
+
+    if len(per_column) <= max_targets:
+        return per_column
+
+    picked: List[Tuple[int, int, int]] = []
+    for i in range(max_targets):
+        idx = round(i * (len(per_column) - 1) / (max_targets - 1))
+        picked.append(per_column[idx])
+    return picked
+
+
+def render_character(theme: Theme) -> str:
     return f"""
-    <g id="{tag}" transform="{transform}">
-      <rect x="8" y="3" width="12" height="10" rx="3" fill="{body_color}" />
-      <rect x="10" y="13" width="8" height="9" rx="2" fill="{body_color}" />
-      <rect x="2" y="12" width="6" height="4" rx="1" fill="{body_color}" />
-      <rect x="20" y="12" width="6" height="4" rx="1" fill="{body_color}" />
-      <rect x="9" y="22" width="4" height="8" rx="1" fill="{body_color}" />
-      <rect x="15" y="22" width="4" height="8" rx="1" fill="{body_color}" />
+    <g id=\"hero\">
+      <rect x=\"3\" y=\"0\" width=\"6\" height=\"4\" rx=\"1\" fill=\"{theme.character_primary}\" />
+      <rect x=\"2\" y=\"4\" width=\"8\" height=\"5\" rx=\"1\" fill=\"{theme.character_primary}\" />
+      <rect x=\"10\" y=\"5\" width=\"3\" height=\"2\" rx=\"1\" fill=\"{theme.character_accent}\" />
+      <rect x=\"0\" y=\"6\" width=\"3\" height=\"2\" rx=\"1\" fill=\"{theme.character_primary}\" />
+      <rect x=\"3\" y=\"9\" width=\"2\" height=\"4\" rx=\"1\" fill=\"{theme.character_primary}\" />
+      <rect x=\"7\" y=\"9\" width=\"2\" height=\"4\" rx=\"1\" fill=\"{theme.character_primary}\" />
     </g>
     """
 
 
-def render_svg(username: str, weeks: Sequence[Sequence[Dict[str, object]]], levels: Sequence[Sequence[int]], metrics: Dict[str, int], theme: Theme) -> str:
-    width, height = 940, 300
-    grid_x, grid_y = 75, 70
-    cell, gap = 11, 3
+def render_svg(username: str, levels: Sequence[Sequence[int]], theme: Theme) -> str:
+    columns = max(1, len(levels))
+    rows = 7
 
-    combo_value = min(metrics["longest_streak"], 99)
-    combo_ratio = min(1.0, combo_value / 30.0)
-    combo_width = int(210 * combo_ratio)
+    cell, gap = 10, 3
+    grid_w = columns * (cell + gap) - gap
+    grid_h = rows * (cell + gap) - gap
 
-    special = "RAGE ART" if metrics["longest_streak"] >= 14 else "COUNTER HIT"
-    if metrics["max_weekly"] >= 45:
-        special = "PERFECT ROUND"
+    grid_x = 38
+    grid_y = 16
+    svg_w = grid_x + grid_w + 18
+    svg_h = grid_y + grid_h + 26
 
-    player_health_w = int((metrics["player_health"] / 100) * 175)
-    rival_health_w = int((metrics["rival_health"] / 100) * 175)
+    hero_start_x = grid_x - 16
+    hero_end_x = grid_x + grid_w - 12
+    hero_y = grid_y + grid_h - 15
+    loop_dur = max(10.0, min(18.0, columns / 3.7))
 
     cells: List[str] = []
-    flashes: List[str] = []
-    pulse_group_duration = "16s"
-
     for wx, week in enumerate(levels):
         for dy, level in enumerate(week):
             x = grid_x + wx * (cell + gap)
             y = grid_y + dy * (cell + gap)
             fill = theme.grid_empty if level == 0 else theme.grid_levels[level - 1]
-            cells.append(
-                f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" fill="{fill}" />'
-            )
-            if level > 0:
-                strength = 0.2 + level * 0.17
-                begin = f"{(wx * 7 + dy) * 0.03:.2f}s"
-                flashes.append(
-                    f'''<rect x="{x-1}" y="{y-1}" width="{cell+2}" height="{cell+2}" rx="3" fill="{theme.impact}" opacity="0">
-  <animate attributeName="opacity" values="0;{strength:.2f};0" begin="{begin}" dur="0.85s" repeatDur="{pulse_group_duration}" repeatCount="indefinite" />
-</rect>'''
-                )
+            cells.append(f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" fill="{fill}" />')
 
-    title = f"Commit Kombat contribution graph for {username}"
+    targets = pick_targets(levels)
+    projectile_fx: List[str] = []
+    impact_fx: List[str] = []
+
+    for i, (wx, dy, level) in enumerate(targets):
+        tx = grid_x + wx * (cell + gap) + (cell / 2)
+        ty = grid_y + dy * (cell + gap) + (cell / 2)
+
+        if columns > 1:
+            progress = wx / (columns - 1)
+        else:
+            progress = 0.0
+
+        sx = hero_start_x + (hero_end_x - hero_start_x) * progress + 12
+        sy = hero_y + 6
+
+        shot_dur = 0.45
+        shoot_frac = min(0.2, shot_dur / loop_dur)
+        offset = (i * loop_dur) / max(1, len(targets))
+
+        projectile_fx.append(
+            f'''<circle cx="{sx:.2f}" cy="{sy:.2f}" r="1.7" fill="{theme.projectile}" opacity="0">
+  <animate attributeName="cx" values="{sx:.2f};{tx:.2f};{tx:.2f}" keyTimes="0;{shoot_frac:.4f};1" dur="{loop_dur:.2f}s" begin="{offset:.2f}s" repeatCount="indefinite" />
+  <animate attributeName="cy" values="{sy:.2f};{ty:.2f};{ty:.2f}" keyTimes="0;{shoot_frac:.4f};1" dur="{loop_dur:.2f}s" begin="{offset:.2f}s" repeatCount="indefinite" />
+  <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.01;{shoot_frac * 0.7:.4f};{shoot_frac:.4f};1" dur="{loop_dur:.2f}s" begin="{offset:.2f}s" repeatCount="indefinite" />
+</circle>'''
+        )
+
+        flash_peak = 0.20 + (level * 0.14)
+        flash_r1 = 1.6 + (level * 0.8)
+        flash_r2 = 3.2 + (level * 1.2)
+        flash_begin = (offset + shot_dur * 0.75) % loop_dur
+        impact_span = min(0.16, 0.24 / loop_dur)
+        impact_fx.append(
+            f'''<circle cx="{tx:.2f}" cy="{ty:.2f}" r="0.9" fill="{theme.flash}" opacity="0">
+  <animate attributeName="r" values="0.9;{flash_r1:.2f};{flash_r2:.2f}" keyTimes="0;{impact_span * 0.5:.4f};{impact_span:.4f}" dur="{loop_dur:.2f}s" begin="{flash_begin:.2f}s" repeatCount="indefinite" />
+  <animate attributeName="opacity" values="0;{flash_peak:.2f};0;0" keyTimes="0;{impact_span * 0.45:.4f};{impact_span:.4f};1" dur="{loop_dur:.2f}s" begin="{flash_begin:.2f}s" repeatCount="indefinite" />
+</circle>'''
+        )
+
+    title = f"Commit Blast contribution graph for {username}"
     desc = (
-        "Animated GitHub-style 7-row contribution grid. "
-        "Contribution intensity drives hit flashes, active streaks build combo, "
-        "weekly totals damage rival health, and inactive gaps trigger counters."
+        "A minimal animated GitHub contribution grid. One original pixel character glides across the weeks and fires energy shots at active contribution cells. "
+        "Impact flashes scale with contribution intensity."
     )
 
-    return f"""<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\" role=\"img\" aria-labelledby=\"title desc\">
-  <title id=\"title\">{escape_xml(title)}</title>
-  <desc id=\"desc\">{escape_xml(desc)}</desc>
-  <rect x=\"0\" y=\"0\" width=\"{width}\" height=\"{height}\" fill=\"{theme.background}\" />
-  <rect x=\"24\" y=\"22\" width=\"892\" height=\"254\" rx=\"14\" fill=\"{theme.panel}\" stroke=\"{theme.border}\" />
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{svg_w}" height="{svg_h}" viewBox="0 0 {svg_w} {svg_h}" role="img" aria-labelledby="title desc">
+  <title id="title">{escape_xml(title)}</title>
+  <desc id="desc">{escape_xml(desc)}</desc>
+  <rect width="{svg_w}" height="{svg_h}" fill="{theme.background}" />
 
-  <text x=\"44\" y=\"45\" fill=\"{theme.title}\" font-size=\"21\" font-family=\"Segoe UI, DejaVu Sans, Arial\" font-weight=\"700\">COMMIT KOMBAT</text>
-  <text x=\"286\" y=\"45\" fill=\"{theme.subtitle}\" font-size=\"13\" font-family=\"Segoe UI, DejaVu Sans, Arial\">{escape_xml(username)} • Repository Fighter</text>
+  <g id="contribution-grid">{"".join(cells)}</g>
+  <g id="projectiles">{"".join(projectile_fx)}</g>
+  <g id="impacts">{"".join(impact_fx)}</g>
 
-  <rect x=\"44\" y=\"58\" width=\"175\" height=\"10\" rx=\"4\" fill=\"{theme.combo_track}\" />
-  <rect x=\"44\" y=\"58\" width=\"{player_health_w}\" height=\"10\" rx=\"4\" fill=\"{theme.left_health}\" />
-  <text x=\"44\" y=\"84\" fill=\"{theme.subtitle}\" font-size=\"11\" font-family=\"Segoe UI, DejaVu Sans, Arial\">PLAYER HP</text>
-
-  <rect x=\"721\" y=\"58\" width=\"175\" height=\"10\" rx=\"4\" fill=\"{theme.combo_track}\" />
-  <rect x=\"{896 - rival_health_w}\" y=\"58\" width=\"{rival_health_w}\" height=\"10\" rx=\"4\" fill=\"{theme.right_health}\" />
-  <text x=\"799\" y=\"84\" text-anchor=\"middle\" fill=\"{theme.subtitle}\" font-size=\"11\" font-family=\"Segoe UI, DejaVu Sans, Arial\">RIVAL HP</text>
-
-  <rect x=\"365\" y=\"42\" width=\"210\" height=\"14\" rx=\"7\" fill=\"{theme.combo_track}\" />
-  <rect x=\"365\" y=\"42\" width=\"{combo_width}\" height=\"14\" rx=\"7\" fill=\"{theme.combo_fill}\" />
-  <text x=\"470\" y=\"38\" text-anchor=\"middle\" fill=\"{theme.title}\" font-size=\"10\" font-family=\"Segoe UI, DejaVu Sans, Arial\">{combo_value} HIT COMBO</text>
-
-  <g id=\"grid\">{''.join(cells)}</g>
-  <g id=\"impact\">{''.join(flashes)}</g>
-
-  {render_fighter(292, 219, 1, theme.left_fighter, 'fighter-left')}
-  {render_fighter(620, 219, -1, theme.right_fighter, 'fighter-right')}
-
-  <text x=\"470\" y=\"219\" text-anchor=\"middle\" fill=\"{theme.title}\" font-size=\"12\" font-family=\"Segoe UI, DejaVu Sans, Arial\">WEEKLY POWER: {metrics['max_weekly']} • INACTIVE GAPS: {metrics['inactive_gaps']}</text>
-
-  <g>
-    <rect x=\"380\" y=\"230\" width=\"182\" height=\"28\" rx=\"6\" fill=\"{theme.special}\" opacity=\"0.85\" />
-    <text x=\"471\" y=\"249\" text-anchor=\"middle\" fill=\"#ffffff\" font-size=\"14\" font-family=\"Segoe UI, DejaVu Sans, Arial\" font-weight=\"700\">{special}</text>
-    <animateTransform attributeName=\"transform\" type=\"scale\" values=\"1;1.04;1\" begin=\"0s\" dur=\"2s\" repeatCount=\"indefinite\" />
-  </g>
-
-  <g opacity=\"0\">
-    <text x=\"470\" y=\"158\" text-anchor=\"middle\" fill=\"{theme.special}\" font-size=\"22\" font-family=\"Segoe UI, DejaVu Sans, Arial\" font-weight=\"800\">K.O.</text>
-    <animate attributeName=\"opacity\" values=\"0;0;0;1;1\" keyTimes=\"0;0.70;0.85;0.95;1\" dur=\"{pulse_group_duration}\" repeatCount=\"indefinite\" />
+  <g transform="translate({hero_start_x},{hero_y})">
+    {render_character(theme)}
+    <animateTransform attributeName="transform" type="translate" values="{hero_start_x} {hero_y}; {hero_end_x} {hero_y}; {hero_start_x} {hero_y}" keyTimes="0;0.5;1" dur="{loop_dur:.2f}s" repeatCount="indefinite" />
   </g>
 </svg>
-"""
+'''
 
 
 def write_svg(path: Path, content: str) -> None:
@@ -392,7 +334,7 @@ def write_svg(path: Path, content: str) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate Commit Kombat contribution SVGs")
+    parser = argparse.ArgumentParser(description="Generate Commit Blast contribution SVGs")
     parser.add_argument("--user", required=True, help="GitHub username")
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN", ""), help="GitHub token")
     parser.add_argument("--weeks", type=int, default=53, help="How many contribution weeks to render")
@@ -410,10 +352,9 @@ def main() -> int:
 
     weeks = build_mock_contribution_weeks(args.weeks) if args.mock else fetch_contribution_weeks(args.user, args.token, args.weeks)
     levels = compute_levels(weeks)
-    metrics = compute_metrics(weeks, levels)
 
-    light_svg = render_svg(args.user, weeks, levels, metrics, THEMES["light"])
-    dark_svg = render_svg(args.user, weeks, levels, metrics, THEMES["dark"])
+    light_svg = render_svg(args.user, levels, THEMES["light"])
+    dark_svg = render_svg(args.user, levels, THEMES["dark"])
 
     write_svg(Path(args.output_light), light_svg)
     write_svg(Path(args.output_dark), dark_svg)
@@ -423,8 +364,7 @@ def main() -> int:
             {
                 "user": args.user,
                 "weeks": args.weeks,
-                "max_weekly": metrics["max_weekly"],
-                "longest_streak": metrics["longest_streak"],
+                "targets": len(pick_targets(levels)),
                 "outputs": [args.output_light, args.output_dark],
             },
             indent=2,

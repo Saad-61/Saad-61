@@ -50,10 +50,10 @@ Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutio
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake.svg">
-  <img alt="Commit Kombat animated GitHub contribution graph" src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake.svg">
+  <img alt="Commit Blast animated GitHub contribution grid with a pixel character firing at active cells" src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/github-contribution-grid-snake.svg">
 </picture>
 
-<sub>Custom commit-driven animation: <strong>Commit Kombat / Repository Fighter</strong>. See <a href="./COMMIT_KOMBAT.md">implementation notes + preview guide</a>.</sub>
+<sub>Custom contribution animation: <strong>Commit Blast</strong>. See <a href="./COMMIT_KOMBAT.md">implementation notes + preview guide</a>.</sub>
 
 ---
 
