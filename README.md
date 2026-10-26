@@ -47,8 +47,8 @@ Software Engineer specializing in **Full-Stack Development** and **AI/ML Solutio
 
 <p align="center">
   <img
-    src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/contribution-ninja.gif"
-    alt="Pixel ninja clearing the contribution grid"
+    src="https://raw.githubusercontent.com/Saad-61/Saad-61/output/contribution-kirby.svg"
+    alt="Kirby inhaling the contribution grid from dark to bright greens"
   />
 </p>
 
