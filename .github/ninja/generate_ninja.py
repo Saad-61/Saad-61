@@ -24,9 +24,11 @@ def read_days(source: Path) -> list[dict[str, Any]]:
     payload = json.loads(source.read_text(encoding="utf-8"))
     weeks = payload["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
     days = [day for week in weeks for day in week["contributionDays"]]
-    if len(days) != COLUMNS * ROWS:
-        raise ValueError(f"Expected {COLUMNS * ROWS} contribution days, got {len(days)}")
-    return days
+    if len(days) > COLUMNS * ROWS:
+        raise ValueError(f"Expected at most {COLUMNS * ROWS} contribution days, got {len(days)}")
+    # GitHub omits partial leading calendar days; pad them as inactive cells.
+    padding = [{"contributionCount": 0, "contributionLevel": "NONE"}] * (COLUMNS * ROWS - len(days))
+    return padding + days
 
 
 def active_cells(days: list[dict[str, Any]]) -> dict[tuple[int, int], int]:
