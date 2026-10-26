@@ -15,7 +15,7 @@ PAD_X, PAD_Y = 30, 38
 WIDTH = PAD_X * 2 + COLUMNS * PITCH - GAP
 HEIGHT = PAD_Y * 2 + ROWS * PITCH - GAP
 SCALE = 2
-FPS_MS = 48
+FPS_MS = 70
 LEVEL_COLOURS = {0: "#161b22", 1: "#0e4429", 2: "#006d32", 3: "#26a641", 4: "#39d353"}
 GITHUB_LEVELS = {"NONE": 0, "FIRST_QUARTILE": 1, "SECOND_QUARTILE": 2, "THIRD_QUARTILE": 3, "FOURTH_QUARTILE": 4}
 
@@ -80,6 +80,12 @@ def draw_ninja(draw: ImageDraw.ImageDraw, x: float, y: float, facing: int, slash
 def draw_frame(cells, cleared, pos, facing, slashing) -> Image.Image:
     image = Image.new("RGB", (WIDTH, HEIGHT), "#0d1117")
     draw = ImageDraw.Draw(image)
+    # Draw every calendar day first, matching GitHub's contribution-grid rhythm.
+    for col in range(COLUMNS):
+        for row in range(ROWS):
+            x, y = PAD_X + col * PITCH, PAD_Y + row * PITCH
+            draw.rounded_rectangle((x, y, x + CELL - 1, y + CELL - 1), radius=2, fill=LEVEL_COLOURS[0])
+    # Cleared contribution cells return to the empty-tile state.
     for (col, row), level in cells.items():
         if (col, row) not in cleared:
             x, y = PAD_X + col * PITCH, PAD_Y + row * PITCH
@@ -96,8 +102,8 @@ def render(days: list[dict[str, Any]], output: Path) -> None:
     previous = (PAD_X - 10, PAD_Y + (ROWS - 1) * PITCH + CELL / 2)
     for point in points:
         target, facing = center(point), 1 if center(point)[0] >= previous[0] else -1
-        for step in range(1, 4):
-            ratio = step / 3
+        for step in range(1, 5):
+            ratio = step / 4
             pos = (previous[0] + (target[0] - previous[0]) * ratio, previous[1] + (target[1] - previous[1]) * ratio)
             frames.append(draw_frame(cells, cleared, pos, facing, False))
         col, row = point
