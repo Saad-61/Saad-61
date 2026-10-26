@@ -6,6 +6,7 @@ import argparse
 import json
 from datetime import date
 from pathlib import Path
+from xml.dom import minidom
 
 CELL, GAP = 10, 3
 PITCH = CELL + GAP
@@ -161,7 +162,7 @@ def build(days: list[dict]) -> str:
     legend.append(f'<text class="lbl" x="{lx + 32 + 5 * PITCH}" y="{legend_y + 9}">More</text>')
 
     kirby = (
-        f'<g id="k"><g transform="scale({KIRBY_SCALE})"><g id="w"opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
+        f'<g id="k"><g transform="scale({KIRBY_SCALE})"><g id="w" opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
         '<path d="M-4-14v-5M0-16v-6M4-14v-5"/></g>'
         '<g id="p"><ellipse cx="-6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(-12 -6.5 6.5)"/>'
         '<ellipse cx="6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(12 6.5 6.5)"/>'
@@ -186,5 +187,7 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    svg = build(read_days(args.input))
+    minidom.parseString(svg)  # <img> rendering is strict XML; fail the build rather than publish a broken image
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(build(read_days(args.input)), encoding="utf-8")
+    args.output.write_text(svg, encoding="utf-8")
