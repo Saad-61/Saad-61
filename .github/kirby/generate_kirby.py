@@ -10,10 +10,11 @@ from pathlib import Path
 CELL, GAP = 10, 3
 PITCH = CELL + GAP
 PAD_L, PAD_R, PAD_T = 36, 16, 26
-LANE = 34
+LANE = 56
 LEGEND = 26
+KIRBY_SCALE = 1.5
 MOVE_PER_COL, MOVE_MIN = 0.07, 0.22
-INHALE, FLIGHT, STAGGER = 0.9, 0.55, 0.25
+FLIGHT, STAGGER, SETTLE = 0.85, 0.35, 0.2
 HOLD_EMPTY, FADE_IN, HOLD_FULL = 1.4, 0.8, 2.2
 LEVELS = {"NONE": 0, "FIRST_QUARTILE": 1, "SECOND_QUARTILE": 2, "THIRD_QUARTILE": 3, "FOURTH_QUARTILE": 4}
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -46,10 +47,14 @@ def plan_actions(cells: list[dict]) -> list[dict]:
     for pass_no, level in enumerate(sorted({c["level"] for c in cells if c["level"]})):
         remaining = [c for c in cells if c["level"] == level]
         order = range(columns) if pass_no % 2 == 0 else range(columns - 1, -1, -1)
+        step = 1 if pass_no % 2 == 0 else -1
         for col in order:
-            eaten = [c for c in remaining if abs(c["col"] - col) <= 1]
-            if not eaten:
+            if not any(c["col"] == col for c in remaining):
                 continue
+            # Stand on a column that holds tiles (one ahead if it has some) so Kirby never lags beside them.
+            if any(c["col"] == col + step for c in remaining):
+                col += step
+            eaten = [c for c in remaining if abs(c["col"] - col) <= 1]
             remaining = [c for c in remaining if c not in eaten]
             actions.append({"col": col, "level": level, "cells": eaten})
     return actions
@@ -63,7 +68,7 @@ def build(days: list[dict]) -> str:
     columns = max(d["col"] for d in days) + 1
     grid_w, grid_h = columns * PITCH - GAP, 7 * PITCH - GAP
     width = PAD_L + grid_w + PAD_R
-    lane_y = PAD_T + grid_h + LANE * 0.55
+    lane_y = PAD_T + grid_h + 30
     height = PAD_T + grid_h + LANE + LEGEND
     kirby_x = lambda col: tile(col, 0)[0] + CELL / 2
 
@@ -79,20 +84,23 @@ def build(days: list[dict]) -> str:
         clock += max(MOVE_MIN, abs(action["col"] - (x - start_x) / PITCH) * MOVE_PER_COL)
         walk.append((clock, target))
         x = target
-        arrive, end = clock, clock + INHALE
-        mouths += [(arrive, 0.0), (arrive + 0.15, 1.0), (end - 0.1, 1.0), (end + 0.1, 0.0)]
-        puffs += [(arrive, 1.0), (end - 0.05, 1.0 + 0.1 + 0.05 * action["level"]), (end + 0.35, 1.0)]
-        ky = lane_y
+        arrive, ky, landed = clock, lane_y, clock
         far = max(abs(tile(0, c["row"])[1] + CELL / 2 - ky) for c in action["cells"])
         for c in action["cells"]:
             cx, cy = tile(c["col"], c["row"])
             near = abs(cy + CELL / 2 - ky) / far
-            begin = arrive + 0.1 + near * STAGGER
+            begin = arrive + 0.15 + near * STAGGER
             flights.append((c, begin, begin + FLIGHT, target - (cx + CELL / 2), ky - (cy + CELL / 2)))
-        clock = end + 0.1
+            landed = max(landed, begin + FLIGHT)
+        # Hold Kirby in place until the last tile has landed, otherwise he drifts off mid-inhale.
+        end = landed + SETTLE
+        walk.append((end, target))
+        mouths += [(arrive, 0.0), (arrive + 0.2, 1.0), (landed, 1.0), (end, 0.0)]
+        puffs += [(arrive, 1.0), (landed, 1.0 + 0.1 + 0.05 * action["level"]), (end + 0.3, 1.0)]
+        clock = end
     reset = clock + HOLD_EMPTY
     total = reset + FADE_IN + HOLD_FULL
-    walk += [(clock + 0.3, x), (reset + FADE_IN, start_x), (total, start_x)]
+    walk += [(reset + FADE_IN, start_x), (total, start_x)]
     puffs.append((total, 1.0))
     mouths.append((total, 0.0))
 
@@ -153,7 +161,7 @@ def build(days: list[dict]) -> str:
     legend.append(f'<text class="lbl" x="{lx + 32 + 5 * PITCH}" y="{legend_y + 9}">More</text>')
 
     kirby = (
-        '<g id="k"><g id="w" opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
+        f'<g id="k"><g transform="scale({KIRBY_SCALE})"><g id="w"opacity="0" stroke="var(--txt)" stroke-width="1" stroke-linecap="round">'
         '<path d="M-4-14v-5M0-16v-6M4-14v-5"/></g>'
         '<g id="p"><ellipse cx="-6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(-12 -6.5 6.5)"/>'
         '<ellipse cx="6.5" cy="6.5" rx="4" ry="2.6" fill="#e63b5a" transform="rotate(12 6.5 6.5)"/>'
@@ -162,7 +170,7 @@ def build(days: list[dict]) -> str:
         '<ellipse cx="-4.6" cy="2" rx="1.9" ry="1.1" fill="#ff7aa8"/><ellipse cx="4.6" cy="2" rx="1.9" ry="1.1" fill="#ff7aa8"/>'
         '<ellipse cx="-2.2" cy="-2.2" rx="1.1" ry="2.1" fill="#1b1f3b"/><ellipse cx="2.2" cy="-2.2" rx="1.1" ry="2.1" fill="#1b1f3b"/>'
         '<rect x="-2.6" y="-3.9" width=".9" height="1" fill="#fff"/><rect x="1.8" y="-3.9" width=".9" height="1" fill="#fff"/>'
-        '<ellipse id="m" cx="0" cy="2.6" rx="2.4" ry="2.6" fill="#9b1d3a" style="transform:scale(0)"/></g></g>'
+        '<ellipse id="m" cx="0" cy="2.6" rx="2.4" ry="2.6" fill="#9b1d3a" style="transform:scale(0)"/></g></g></g>'
     )
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" width="{width}" height="{height}" '
