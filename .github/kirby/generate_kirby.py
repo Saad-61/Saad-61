@@ -10,7 +10,7 @@ from xml.dom import minidom
 
 CELL, GAP = 10, 3
 PITCH = CELL + GAP
-PAD_L, PAD_R, PAD_T = 36, 16, 52  # PAD_T leaves room for the stats row above the month labels
+PAD_L, PAD_R, PAD_T = 48, 48, 52  # Keep enlarged Kirby inside the SVG at both graph endpoints
 LANE = 76
 LEGEND = 26
 KIRBY_SCALE, KIRBY_FULL = 1.0, 2.5  # Kirby grows from the first to the second size as tiles are eaten
